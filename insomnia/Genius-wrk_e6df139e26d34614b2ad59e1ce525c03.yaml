@@ -1,0 +1,70 @@
+type: collection.insomnia.rest/5.0
+schema_version: "5.1"
+name: Genius
+meta:
+  id: wrk_e6df139e26d34614b2ad59e1ce525c03
+  created: 1787597889038
+  modified: 1787597889038
+  description: ""
+collection:
+  - url: http://localhost:3000/genius/partidas
+    name: Partida
+    meta:
+      id: req_a547ce4188b74c30811f49501727f13d
+      created: 1787597970089
+      modified: 1787598143681
+      isPrivate: false
+      description: ""
+      sortKey: -1787597970089
+    method: POST
+    body:
+      mimeType: application/json
+      text: |-
+        {
+            "nome": "Felipe",
+            "nivel": 20,
+            "coresAcertadas": 80,
+            "tempo": 130
+        }
+    headers:
+      - name: Content-Type
+        value: application/json
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: http://localhost:3000/genius/ranking
+    name: Ranking
+    meta:
+      id: req_9040b6e2b3f4437da42f8e0263908c8a
+      created: 1787598108900
+      modified: 1787598136941
+      isPrivate: false
+      description: ""
+      sortKey: -1787598108900
+    method: GET
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+cookieJar:
+  name: Default Jar
+  meta:
+    id: jar_836b86464acf41747182d8a58f49329e41ba4a2b
+    created: 1787597889042
+    modified: 1787597889042
+environments:
+  name: Base Environment
+  meta:
+    id: env_836b86464acf41747182d8a58f49329e41ba4a2b
+    created: 1787597889040
+    modified: 1787597889040
+    isPrivate: false

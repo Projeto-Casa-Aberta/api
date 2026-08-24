@@ -1,0 +1,333 @@
+type: collection.insomnia.rest/5.0
+schema_version: "5.1"
+name: Terminais
+meta:
+  id: wrk_86f13a3f8ab548559c0ccc072b73328a
+  created: 1787595599184
+  modified: 1787595654176
+  description: ""
+collection:
+  - name: Terminal 1
+    meta:
+      id: fld_b6a326302dba43bbbb918f37ae11052d
+      created: 1787596722604
+      modified: 1787596722604
+      sortKey: -1787596722604
+      description: ""
+    children:
+      - url: http://localhost:3000/terminal/1
+        name: Terminal 1
+        meta:
+          id: req_29d6bf0a6e7044208a2f0b3f829ce5b9
+          created: 1787595936725
+          modified: 1787596753872
+          isPrivate: false
+          description: ""
+          sortKey: -1787596745234
+        method: GET
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:3000/terminal/1/status
+        name: Terminal 1 - Status
+        meta:
+          id: req_c14cc5e80f714971a21c35817d923813
+          created: 1787596505209
+          modified: 1787596751763
+          isPrivate: false
+          description: ""
+          sortKey: -1787596745134
+        method: GET
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:3000/terminal/1/concluir
+        name: Concluir
+        meta:
+          id: req_45aa13d92ef642fbb908400f9746106e
+          created: 1787596758675
+          modified: 1787597032561
+          isPrivate: false
+          description: ""
+          sortKey: -1787596745034
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+                "nivel": 10
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+  - name: Terminal 2
+    meta:
+      id: fld_de790b29385949e1933156f379810b2e
+      created: 1787596732969
+      modified: 1787596732969
+      sortKey: -1787596732969
+      description: ""
+    children:
+      - url: http://localhost:3000/terminal/2
+        name: Terminal 2
+        meta:
+          id: req_50d93d16c21b4693892d4d1ea18cb53f
+          created: 1787595960874
+          modified: 1787596811273
+          isPrivate: false
+          description: ""
+          sortKey: -1787596809071
+        method: GET
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:3000/terminal/2/status
+        name: Terminal 2 - Status
+        meta:
+          id: req_4334c59e5e2a4b76825f743b314e8561
+          created: 1787596492506
+          modified: 1787596809024
+          isPrivate: false
+          description: ""
+          sortKey: -1787596808971
+        method: GET
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:3000/terminal/2/concluir
+        name: Concluir
+        meta:
+          id: req_d158b73c4df943d2a0c243ab5def6541
+          created: 1787596823093
+          modified: 1787596857005
+          isPrivate: false
+          description: ""
+          sortKey: -1787596808871
+        method: POST
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+  - name: Terminal 3
+    meta:
+      id: fld_645e8a9cb6ee4bc9b17f8b7b5c38a449
+      created: 1787596741362
+      modified: 1787596741362
+      sortKey: -1787596741362
+      description: ""
+    children:
+      - url: http://localhost:3000/terminal/3
+        name: Terminal 3
+        meta:
+          id: req_aa974f0be7254cc39158fc0ae5963f10
+          created: 1787595978301
+          modified: 1787596815578
+          isPrivate: false
+          description: ""
+          sortKey: -1787596813865
+        method: GET
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:3000/terminal/3/status
+        name: Terminal 3 - Status
+        meta:
+          id: req_893de1858a324441b724943b23af227d
+          created: 1787596474375
+          modified: 1787596813809
+          isPrivate: false
+          description: ""
+          sortKey: -1787596813765
+        method: GET
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:3000/terminal/3/concluir
+        name: Concluir
+        meta:
+          id: req_11c2ed9ba31448a8abe02d77b8d1764f
+          created: 1787596833177
+          modified: 1787596871150
+          isPrivate: false
+          description: ""
+          sortKey: -1787596813665
+        method: POST
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+  - name: Ranking
+    meta:
+      id: fld_7c9983d593514fcb8898b306ed84c0fe
+      created: 1787597147081
+      modified: 1787597147081
+      sortKey: -1787597147081
+      description: ""
+    children:
+      - url: http://localhost:3000/terminal/ranking
+        name: Ranking
+        meta:
+          id: req_b33f04a716fc4f52befa3651fe1891bf
+          created: 1787597159771
+          modified: 1787597744632
+          isPrivate: false
+          description: ""
+          sortKey: -1787597159771
+        method: GET
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+  - name: Sistema
+    meta:
+      id: fld_b17bd32a29de4bfba3680c86ecfbd9d2
+      created: 1787597830288
+      modified: 1787597830288
+      sortKey: -1787597830288
+      description: ""
+    children:
+      - url: http://localhost:3000/terminal/iniciar
+        name: Iniciar
+        meta:
+          id: req_5dda83cf03b142c1a71d101696ad9431
+          created: 1787595599627
+          modified: 1787597839849
+          isPrivate: false
+          description: ""
+          sortKey: -1787597835559
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "nome": "Equipe Teste",
+              "codigoCor": "A1B2C3"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:3000/terminal/validar
+        name: Validar
+        meta:
+          id: req_adea08b070fa44c3ac183fc6c5574333
+          created: 1787597045052
+          modified: 1787597837166
+          isPrivate: false
+          description: ""
+          sortKey: -1787597835459
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "codigo": "A1B2C3"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:3000/terminal/liberar
+        name: Liberar
+        meta:
+          id: req_88aef86ca44d4e86b270adf7ee2599da
+          created: 1787597156761
+          modified: 1787597835399
+          isPrivate: false
+          description: ""
+          sortKey: -1787597835359
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+                "senha": "teste"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+cookieJar:
+  name: Default Jar
+  meta:
+    id: jar_648c5f092eac769954854d4249f43d69a558b49e
+    created: 1787595599220
+    modified: 1787595599220
+environments:
+  name: Base Environment
+  meta:
+    id: env_648c5f092eac769954854d4249f43d69a558b49e
+    created: 1787595599214
+    modified: 1787595599214
+    isPrivate: false
