@@ -45,14 +45,14 @@ router.post("/partidas", async (req, res) => {
 
         if (
             typeof nome !== "string" ||
-            typeof nivel !== "number" ||
-            typeof coresAcertadas !== "number" ||
-            typeof tempo !== "number"
+            !Number.isInteger(nivel) ||
+            !Number.isInteger(coresAcertadas) ||
+            !Number.isInteger(tempo)
         ) {
 
             return res.status(400).json({
                 sucesso: false,
-                mensagem: "Dados enviados possuem tipos inválidos."
+                mensagem: "Nome deve ser uma string e nível, cores acertadas e tempo devem ser números inteiros."
             });
 
         }
@@ -146,6 +146,7 @@ router.post("/partidas", async (req, res) => {
 
 });
 
+
 // ============================================================
 // GET /genius/ranking
 // ============================================================
@@ -206,5 +207,6 @@ router.get("/ranking", async (req, res) => {
     }
 
 });
+
 
 module.exports = router;

@@ -5,6 +5,29 @@ const router = express.Router();
 
 
 // ============================================================
+// FUNÇÃO: EMBARALHAR ARRAY
+// Fisher-Yates
+// ============================================================
+
+function embaralhar(array) {
+
+    const resultado = [...array];
+
+    for (let i = resultado.length - 1; i > 0; i--) {
+
+        const j = Math.floor(Math.random() * (i + 1));
+
+        [resultado[i], resultado[j]] =
+            [resultado[j], resultado[i]];
+
+    }
+
+    return resultado;
+
+}
+
+
+// ============================================================
 // POST /terminal/iniciar
 // ============================================================
 
@@ -44,39 +67,53 @@ router.post("/iniciar", async (req, res) => {
 
 
         // ========================================================
-        // TRANSFORMAR O CÓDIGO EM ARRAY DE CARACTERES
+        // EMBARALHAR OS 6 CARACTERES
         // ========================================================
 
         const caracteres = codigo.split("");
 
-
-        // ========================================================
-        // EMBARALHAR OS 6 CARACTERES
-        // Fisher-Yates
-        // ========================================================
-
-        for (let i = caracteres.length - 1; i > 0; i--) {
-
-            const j = Math.floor(Math.random() * (i + 1));
-
-            [caracteres[i], caracteres[j]] =
-                [caracteres[j], caracteres[i]];
-
-        }
+        const caracteresEmbaralhados =
+            embaralhar(caracteres);
 
 
         // ========================================================
         // FORMAR OS 3 PARES
         // ========================================================
 
+        const pares = [
+
+            caracteresEmbaralhados[0] +
+            caracteresEmbaralhados[1],
+
+            caracteresEmbaralhados[2] +
+            caracteresEmbaralhados[3],
+
+            caracteresEmbaralhados[4] +
+            caracteresEmbaralhados[5]
+
+        ];
+
+
+        // ========================================================
+        // EMBARALHAR OS 3 PARES
+        // ========================================================
+
+        const paresEmbaralhados =
+            embaralhar(pares);
+
+
+        // ========================================================
+        // DISTRIBUIR OS PARES ENTRE OS TERMINAIS
+        // ========================================================
+
         const codigoTerminal1 =
-            caracteres[0] + caracteres[1];
+            paresEmbaralhados[0];
 
         const codigoTerminal2 =
-            caracteres[2] + caracteres[3];
+            paresEmbaralhados[1];
 
         const codigoTerminal3 =
-            caracteres[4] + caracteres[5];
+            paresEmbaralhados[2];
 
 
         // ========================================================
@@ -257,6 +294,7 @@ router.get("/3", async (req, res) => {
 
 });
 
+
 // ============================================================
 // BUSCAR STATUS DE UM TERMINAL
 // ============================================================
@@ -406,6 +444,7 @@ router.get("/3/status", async (req, res) => {
     await buscarStatusTerminal(req, res, 3);
 
 });
+
 
 // ============================================================
 // CONCLUIR TERMINAL
@@ -585,6 +624,7 @@ router.post("/3/concluir", async (req, res) => {
     await concluirTerminal(req, res, 3);
 
 });
+
 
 // ============================================================
 // POST /terminal/validar
@@ -810,6 +850,7 @@ router.post("/validar", async (req, res) => {
 
 });
 
+
 // ============================================================
 // GET /terminal/ranking
 // ============================================================
@@ -867,6 +908,7 @@ router.get("/ranking", async (req, res) => {
     }
 
 });
+
 
 // ============================================================
 // POST /terminal/liberar
@@ -951,5 +993,6 @@ router.post("/liberar", async (req, res) => {
     }
 
 });
+
 
 module.exports = router;
