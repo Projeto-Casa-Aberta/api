@@ -37,7 +37,7 @@ router.post("/iniciar", async (req, res) => {
 
     try {
 
-        const { nome, codigoCor } = req.body;
+        const { nome, codigoCor, tempoLimite } = req.body;
 
 
         // ========================================================
@@ -64,6 +64,32 @@ router.post("/iniciar", async (req, res) => {
             });
 
         }
+
+
+        // ========================================================
+        // VALIDAR TEMPO LIMITE (opcional, em minutos)
+        // ========================================================
+
+        const TEMPO_LIMITE_PADRAO_MINUTOS = 10;
+
+        let tempoLimiteMinutos = TEMPO_LIMITE_PADRAO_MINUTOS;
+
+        if (tempoLimite !== undefined) {
+
+            if (!Number.isInteger(tempoLimite) || tempoLimite <= 0) {
+
+                return res.status(400).json({
+                    sucesso: false,
+                    mensagem: "tempoLimite deve ser um número inteiro de minutos maior que zero."
+                });
+
+            }
+
+            tempoLimiteMinutos = tempoLimite;
+
+        }
+
+        const tempoLimiteSegundos = tempoLimiteMinutos * 60;
 
 
         // ========================================================
@@ -158,16 +184,18 @@ router.post("/iniciar", async (req, res) => {
                 codigo_terminal_1,
                 codigo_terminal_2,
                 codigo_terminal_3,
+                tempo_limite_segundos,
                 status
             )
-            VALUES ($1, $2, $3, $4, $5, 'EM_ANDAMENTO')
-            RETURNING id, status
+            VALUES ($1, $2, $3, $4, $5, $6, 'EM_ANDAMENTO')
+            RETURNING id, status, tempo_limite_segundos
         `, [
             nome,
             codigo,
             codigoTerminal1,
             codigoTerminal2,
-            codigoTerminal3
+            codigoTerminal3,
+            tempoLimiteSegundos
         ]);
 
 
@@ -188,7 +216,8 @@ router.post("/iniciar", async (req, res) => {
         return res.status(201).json({
             sucesso: true,
             equipeId: equipe.id,
-            status: equipe.status
+            status: equipe.status,
+            tempoLimiteSegundos: equipe.tempo_limite_segundos
         });
 
 
@@ -310,6 +339,7 @@ async function buscarStatusTerminal(req, res, numeroTerminal) {
                 id,
                 status,
                 entrada_em,
+                tempo_limite_segundos,
                 ${coluna}
             FROM equipes
             WHERE status = 'EM_ANDAMENTO'
@@ -349,10 +379,11 @@ async function buscarStatusTerminal(req, res, numeroTerminal) {
             const tempoDecorrido =
                 agora.getTime() - entrada.getTime();
 
-            const DEZ_MINUTOS = 10 * 60 * 1000;
+            const limiteMs =
+                equipe.tempo_limite_segundos * 1000;
 
 
-            if (tempoDecorrido >= DEZ_MINUTOS) {
+            if (tempoDecorrido >= limiteMs) {
 
                 await pool.query(`
                     UPDATE equipes
@@ -392,7 +423,8 @@ async function buscarStatusTerminal(req, res, numeroTerminal) {
 
         return res.status(200).json({
             status: "ATIVO",
-            concluido: equipe[coluna]
+            concluido: equipe[coluna],
+            tempoLimiteSegundos: equipe.tempo_limite_segundos
         });
 
 
@@ -464,7 +496,8 @@ async function concluirTerminal(req, res, numeroTerminal) {
             SELECT
                 id,
                 status,
-                entrada_em
+                entrada_em,
+                tempo_limite_segundos
             FROM equipes
             WHERE status = 'EM_ANDAMENTO'
             LIMIT 1
@@ -494,10 +527,11 @@ async function concluirTerminal(req, res, numeroTerminal) {
         const tempoDecorrido =
             agora.getTime() - entrada.getTime();
 
-        const DEZ_MINUTOS = 10 * 60 * 1000;
+        const limiteMs =
+            equipe.tempo_limite_segundos * 1000;
 
 
-        if (tempoDecorrido >= DEZ_MINUTOS) {
+        if (tempoDecorrido >= limiteMs) {
 
             await client.query(`
                 UPDATE equipes
@@ -675,6 +709,7 @@ router.post("/validar", async (req, res) => {
                 codigo_cor,
                 status,
                 entrada_em,
+                tempo_limite_segundos,
                 terminal_1_finalizado,
                 terminal_2_finalizado,
                 terminal_3_finalizado
@@ -711,10 +746,11 @@ router.post("/validar", async (req, res) => {
         const tempoDecorrido =
             agora.getTime() - entrada.getTime();
 
-        const DEZ_MINUTOS = 10 * 60 * 1000;
+        const limiteMs =
+            equipe.tempo_limite_segundos * 1000;
 
 
-        if (tempoDecorrido >= DEZ_MINUTOS) {
+        if (tempoDecorrido >= limiteMs) {
 
             await client.query(`
                 UPDATE equipes
@@ -984,6 +1020,93 @@ router.post("/liberar", async (req, res) => {
     } catch (erro) {
 
         console.error("Erro ao liberar sala:", erro);
+
+        return res.status(500).json({
+            sucesso: false,
+            mensagem: "Erro interno do servidor."
+        });
+
+    }
+
+});
+
+
+// ============================================================
+// POST /terminal/interromper
+// ============================================================
+
+router.post("/interromper", async (req, res) => {
+
+    try {
+
+        const { senha } = req.body;
+
+
+        // ========================================================
+        // VALIDAR SENHA
+        // ========================================================
+
+        if (!senha) {
+
+            return res.status(400).json({
+                sucesso: false,
+                mensagem: "A senha é obrigatória."
+            });
+
+        }
+
+
+        // ========================================================
+        // VERIFICAR SENHA ADMINISTRATIVA
+        // ========================================================
+
+        if (senha !== process.env.SENHA_ADMIN) {
+
+            return res.status(401).json({
+                sucesso: false,
+                mensagem: "Senha administrativa inválida."
+            });
+
+        }
+
+
+        // ========================================================
+        // ENCERRAR EQUIPE EM ANDAMENTO
+        // ========================================================
+
+        const resultado = await pool.query(`
+            UPDATE equipes
+            SET status = 'EXPIRADO'
+            WHERE status = 'EM_ANDAMENTO'
+            RETURNING id
+        `);
+
+
+        if (resultado.rows.length === 0) {
+
+            return res.status(404).json({
+                sucesso: false,
+                mensagem: "Não existe equipe em andamento."
+            });
+
+        }
+
+
+        // ========================================================
+        // RESPOSTA
+        // ========================================================
+
+        return res.status(200).json({
+            sucesso: true,
+            mensagem: "Partida interrompida pelo administrador.",
+            equipeId: resultado.rows[0].id,
+            status: "EXPIRADO"
+        });
+
+
+    } catch (erro) {
+
+        console.error("Erro ao interromper partida:", erro);
 
         return res.status(500).json({
             sucesso: false,
