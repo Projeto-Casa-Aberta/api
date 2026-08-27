@@ -1,5 +1,6 @@
 const express = require("express");
 const pool = require("../config/database");
+const { senhaAdminValida, registrarAuditoria } = require("./admin.helper");
 
 const router = express.Router();
 
@@ -33,11 +34,13 @@ function embaralhar(array) {
 
 router.post("/iniciar", async (req, res) => {
 
+    console.log(">>> POST /terminal/iniciar RECEBIDO");
+
     const client = await pool.connect();
 
     try {
 
-        const { nome, codigoCor, tempoLimite } = req.body;
+        const { nome, codigoCor, tempoLimite, senha, administrador } = req.body;
 
 
         // ========================================================
@@ -86,6 +89,39 @@ router.post("/iniciar", async (req, res) => {
             }
 
             tempoLimiteMinutos = tempoLimite;
+
+        }
+
+        const tempoAlterado =
+            tempoLimiteMinutos !== TEMPO_LIMITE_PADRAO_MINUTOS;
+            console.log("TEMPO:", tempoLimiteMinutos);
+            console.log("TEMPO ALTERADO:", tempoAlterado);
+            console.log("ADMINISTRADOR:", administrador);
+
+
+        // ========================================================
+        // SE O TEMPO FOI ALTERADO, EXIGE AUTORIZAÇÃO ADMINISTRATIVA
+        // ========================================================
+
+        if (tempoAlterado) {
+
+            if (!administrador) {
+
+                return res.status(400).json({
+                    sucesso: false,
+                    mensagem: "O nome do administrador é obrigatório para alterar o tempo limite."
+                });
+
+            }
+
+            if (!senhaAdminValida(senha)) {
+
+                return res.status(401).json({
+                    sucesso: false,
+                    mensagem: "Senha administrativa inválida."
+                });
+
+            }
 
         }
 
@@ -197,6 +233,28 @@ router.post("/iniciar", async (req, res) => {
             codigoTerminal3,
             tempoLimiteSegundos
         ]);
+
+
+        // ========================================================
+        // AUDITORIA (só se o tempo foi alterado do padrão)
+        // ========================================================
+
+        if (tempoAlterado) {
+
+            console.log(">>> ENTRANDO NA AUDITORIA DO TEMPO");
+
+            await registrarAuditoria(client, {
+                administrador,
+                acao: "ALTERAR_TEMPO_INICIO",
+                configuracao: "tempo_limite_segundos",
+                valorAnterior: TEMPO_LIMITE_PADRAO_MINUTOS * 60,
+                valorNovo: tempoLimiteSegundos,
+                resultado: "SUCESSO"
+            });
+
+            console.log(">>> AUDITORIA REGISTRADA");
+
+        }
 
 
         // ========================================================
@@ -975,7 +1033,7 @@ router.post("/liberar", async (req, res) => {
         // VERIFICAR SENHA ADMINISTRATIVA
         // ========================================================
 
-        if (senha !== process.env.SENHA_ADMIN) {
+        if (!senhaAdminValida(senha)) {
 
             return res.status(401).json({
                 sucesso: false,
@@ -1037,13 +1095,15 @@ router.post("/liberar", async (req, res) => {
 
 router.post("/interromper", async (req, res) => {
 
+    const client = await pool.connect();
+
     try {
 
-        const { senha } = req.body;
+        const { senha, administrador } = req.body;
 
 
         // ========================================================
-        // VALIDAR SENHA
+        // VALIDAR CAMPOS OBRIGATÓRIOS
         // ========================================================
 
         if (!senha) {
@@ -1055,12 +1115,21 @@ router.post("/interromper", async (req, res) => {
 
         }
 
+        if (!administrador) {
+
+            return res.status(400).json({
+                sucesso: false,
+                mensagem: "O nome do administrador é obrigatório."
+            });
+
+        }
+
 
         // ========================================================
         // VERIFICAR SENHA ADMINISTRATIVA
         // ========================================================
 
-        if (senha !== process.env.SENHA_ADMIN) {
+        if (!senhaAdminValida(senha)) {
 
             return res.status(401).json({
                 sucesso: false,
@@ -1071,10 +1140,12 @@ router.post("/interromper", async (req, res) => {
 
 
         // ========================================================
-        // ENCERRAR EQUIPE EM ANDAMENTO
+        // ENCERRAR EQUIPE EM ANDAMENTO + AUDITORIA
         // ========================================================
 
-        const resultado = await pool.query(`
+        await client.query("BEGIN");
+
+        const resultado = await client.query(`
             UPDATE equipes
             SET status = 'EXPIRADO'
             WHERE status = 'EM_ANDAMENTO'
@@ -1084,12 +1155,26 @@ router.post("/interromper", async (req, res) => {
 
         if (resultado.rows.length === 0) {
 
+            await client.query("ROLLBACK");
+
             return res.status(404).json({
                 sucesso: false,
                 mensagem: "Não existe equipe em andamento."
             });
 
         }
+
+
+        await registrarAuditoria(client, {
+            administrador,
+            acao: "INTERROMPER_SALA",
+            valorAnterior: "EM_ANDAMENTO",
+            valorNovo: "EXPIRADO",
+            resultado: "SUCESSO"
+        });
+
+
+        await client.query("COMMIT");
 
 
         // ========================================================
@@ -1106,12 +1191,18 @@ router.post("/interromper", async (req, res) => {
 
     } catch (erro) {
 
+        await client.query("ROLLBACK");
+
         console.error("Erro ao interromper partida:", erro);
 
         return res.status(500).json({
             sucesso: false,
             mensagem: "Erro interno do servidor."
         });
+
+    } finally {
+
+        client.release();
 
     }
 

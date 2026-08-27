@@ -1,4 +1,5 @@
 const express = require("express");
+console.log(">>> TERMINAL.ROUTES CARREGADO");
 const cors = require("cors");
 const pool = require("./config/database");
 
@@ -6,6 +7,7 @@ require("dotenv").config();
 
 const terminalRoutes = require("./routes/terminal.routes");
 const geniusRoutes = require("./routes/genius.routes");
+const adminRoutes = require("./routes/admin.routes");
 
 const app = express();
 
@@ -14,6 +16,7 @@ app.use(express.json());
 
 app.use("/terminal", terminalRoutes);
 app.use("/genius", geniusRoutes);
+app.use("/admin", adminRoutes);
 
 
 app.get("/", (req, res) => {
